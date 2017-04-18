@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!-- THIS IS FOR GIT CLIENT ONLY This build file is a template Ant task that 
+	pulls sources from GIT. NOTE: Do not change the name of this file. GIT executable 
+	should be configued in the path of the system variables. -->
+<project default="CheckOut" basedir="C:/Jenkins/workspace">
+	<echo> Base dir is --- ${basedir} --- </echo>
+	<property name="build.checkout.dir" value="C:/Jenkins/workspace" />
+	<macrodef name="git">
+		<attribute name="command" />
+		<attribute name="dir" default="C:/Jenkins/workspace" />
+		<element name="args" optional="true" />
+		<sequential>
+			<echo message="git @{command}" />
+			<exec executable="git" dir="@{dir}">
+				<arg value="@{command}" />
+				<args />
+			</exec>
+		</sequential>
+	</macrodef>
+	<macrodef name="git-clone-pull">
+		<attribute name="repository" />
+		<attribute name="dest" />
+		<sequential>
+			<git command="clone">
+				<args>
+					<arg value="@{repository}" />
+					<arg value="@{dest}" />
+				</args>
+			</git>
+			<git command="pull" dir="@{dest}" />
+		</sequential>
+	</macrodef>
+	<if>
+		<equals arg1="${build.checkout.dir}" arg2="" />
+		<then>
+			<fail>Please set "build.checkout.dir" property. </fail>
+		</then>
+	</if>	
+	<target name="CheckOut" depends="clean" description="pull out all the sources from version control">
+		<git command="clone">
+			<args>
+				<arg value="https://github.com/quinnoxCI/CI.git" />
+				<arg value="CI" />
+			</args>
+		</git>
+		<git command="pull" dir="${build.checkout.dir}" />
+	</target>
+	<target name="clean" description="Clean up the checkout directory">
+		<delete dir="${build.checkout.dir}" />
+	</target>
+</project>
